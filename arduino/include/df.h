@@ -11,9 +11,11 @@ struct temperature_point
 struct temperature_data
 {
   SdFile file;
-  temperature_data(SdFile& root, const char* path)
+  const char* path;
+  SdFile& root;
+  temperature_data(SdFile& root, const char* path) : root(root), path(path)
   {
-    file.open(root, path, 0x1F)
+    file.open(root, path, 0x1F);
   }
   temperature_point load_next()
   {
@@ -23,17 +25,25 @@ struct temperature_data
   }
   int size()
   {
-    return file.size() / sizeof(temperature_point);
+    return file.fileSize() / sizeof(temperature_point);
   }
   void clearPos()
   {
     file.seekSet(0);
   }
-  void append_new_data(const temperature_point& point)
+  void append_new_data(temperature_point point)
   {
     file.seekEnd();
     file.write(&point, sizeof(temperature_point));
   }
-}
+  void clear()
+  {
+    file.remove();
+    file.open(root, path, 0x1F);
+  }
+  void close()
+  {
+    file.close();
+  }
+};
 #endif
-// end df.h

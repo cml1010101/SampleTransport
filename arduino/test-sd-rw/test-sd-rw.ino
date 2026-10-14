@@ -29,7 +29,7 @@ void setup() {
   }
   hello.write("Hello World!");
   hello.close();
-  if (!hello.open(&root, "hello.txt", 0x1))
+  if (!hello.open(&root, "hello.txt", O_CREAT))
   {
     Serial.println("Failure on open for read");
     return;
