@@ -1,4 +1,4 @@
-// start df.h
+// df.h
 #ifndef DF_H
 #define DF_H
 #include <SPI.h>
@@ -12,10 +12,11 @@ struct temperature_data
 {
   SdFile file;
   const char* path;
-  SdFile& root;
-  temperature_data(SdFile& root, const char* path) : root(root), path(path)
+  SdFile* root;
+  temperature_data() = default;
+  temperature_data(SdFile* root, const char* path) : root(root), path(path)
   {
-    file.open(root, path, 0x1F);
+    file.open(*root, path, 0x1F);
   }
   temperature_point load_next()
   {
@@ -39,11 +40,30 @@ struct temperature_data
   void clear()
   {
     file.remove();
-    file.open(root, path, 0x1F);
+    file.open(*root, path, 0x1F);
   }
   void close()
   {
     file.close();
+  }
+  temperature_point load_first()
+  {
+    clearPos();
+    return load_next();
+  }
+  temperature_point load_last()
+  {
+    file.seekSet(file.fileSize() - sizeof(temperature_point));
+    temperature_point point;
+    file.read(&point, sizeof(temperature_point));
+    return point;
+  }
+  double time_range()
+  {
+    auto a = load_first();
+    auto b = load_last();
+    clearPos();
+    return b.time - a.time;
   }
 };
 #endif

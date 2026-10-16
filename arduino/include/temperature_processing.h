@@ -1,10 +1,9 @@
+// temperature_processing.h
 
 #ifndef TEMPERATURE_PROCESSING_H
 #define TEMPERATURE_PROCESSING_H
 
-#include "df.h"
-
-double timeAtTemperature(temperature_data data, double target, double range)
+double timeAtTemperature(temperature_data& data, double target, double range)
 {
     data.clearPos();
     double totalSeconds = 0;
@@ -15,8 +14,8 @@ double timeAtTemperature(temperature_data data, double target, double range)
     {
         temperature_point current = data.load_next();
 
-        if (previous.temperature >= target - range &&
-            previous.temperature <= target + range)
+        if (previous.temperature >= target + range ||
+            previous.temperature <= target - range)
         {
             double duration = current.time - previous.time;
 
