@@ -10,6 +10,7 @@
 constexpr uint8_t ONE_WIRE_BUS = 22;  // GP22, physical pin 29 on the Pico
 constexpr uint8_t LCD_SDA_PIN = 4;    // GP4, physical pin 6
 constexpr uint8_t LCD_SCL_PIN = 5;    // GP5, physical pin 7
+constexpr uint8_t LED = 25;
 
 constexpr unsigned long UPDATE_INTERVAL_MS = 1000UL;
 constexpr uint8_t DISPLAY_LENGTH = 20;
@@ -138,16 +139,19 @@ void setup() {
   lcd.createChar(1, plusMinusChar);
   lcd.clear();
   initializeTemperatureSensor();
+  pinMode(LED, OUTPUT);
 
   // Show the first reading immediately, then start one conversion every 5 s.
   lastUpdateStartedMs = millis();
   updateTemperature();
 }
-
+int toggle = 1;
 void loop() {
   const unsigned long now = millis();
   if (now - lastUpdateStartedMs >= UPDATE_INTERVAL_MS) {
     lastUpdateStartedMs = now;
     updateTemperature();
+    digitalWrite(LED, toggle);
+    toggle = !toggle;
   }
 }
